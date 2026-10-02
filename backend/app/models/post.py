@@ -78,7 +78,7 @@ class PostProduct(Base, TimestampMixin):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), nullable=False)
-    product_id = Column(Integer, ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
+    product_id = Column(Integer, ForeignKey("products.id", ondelete="CASCADE"), nullable=True)
     affiliate_url = Column(Text, nullable=True)
     position = Column(Integer, nullable=False)
     is_generic_idea = Column(Boolean, default=False)
