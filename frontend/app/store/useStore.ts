@@ -31,13 +31,11 @@ interface Store {
   currentPost: Post | null
   isLoading: boolean
 
-  // Auth
   login: (email: string, password: string) => Promise<void>
   register: (email: string, name: string, password: string) => Promise<void>
   logout: () => void
   fetchUser: () => Promise<void>
 
-  // Posts
   createPost: (data: { language?: string; tone?: string }) => Promise<Post>
   fetchPosts: () => Promise<void>
   fetchPost: (id: number) => Promise<void>
@@ -45,7 +43,6 @@ interface Store {
   generateContent: (postId: number, regenerate?: boolean) => Promise<void>
   generateScript: (postId: number, duration: number) => Promise<void>
 
-  // Creator Page
   createCreatorPage: (postId: number, showPhoto?: boolean) => Promise<string>
 }
 
@@ -73,12 +70,7 @@ export const useStore = create<Store>((set, get) => ({
   },
 
   register: async (email, name, password) => {
-    await axios.post(`${API_URL}/auth/register`, {
-      email,
-      name,
-      password,
-    })
-
+    await axios.post(`${API_URL}/auth/register`, { email, name, password })
     await get().login(email, password)
   },
 
@@ -173,13 +165,11 @@ export const useStore = create<Store>((set, get) => ({
     set({ isLoading: true })
 
     try {
-      const response = await axios.post(
+      await axios.post(
         `${API_URL}/posts/${postId}/script`,
         { post_id: postId, duration_seconds: duration },
         { headers: { Authorization: `Bearer ${token}` } }
       )
-
-      // Refresh post to get script
       await get().fetchPost(postId)
     } finally {
       set({ isLoading: false })
