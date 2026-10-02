@@ -113,16 +113,11 @@ async def get_creator_page(
     # Get photo if allowed
     photo_url = None
     if page.show_photo and post.photos:
-        photo_url = post.photos[0].storage_key  # Would need S3 presigned URL
+        photo_url = post.photos[0].storage_key
 
     return {
-        "page": {
-            "slug": page.slug,
-            "show_photo": page.show_photo,
-        },
-        "creator": {
-            "name": creator.name,
-        },
+        "page": {"slug": page.slug, "show_photo": page.show_photo},
+        "creator": {"name": creator.name},
         "post": {
             "caption": latest_caption.text if latest_caption else "",
             "outfit_description": latest_caption.outfit_description if latest_caption else "",

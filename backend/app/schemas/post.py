@@ -46,7 +46,7 @@ class ProductResponse(BaseModel):
 
 class PostProductResponse(BaseModel):
     id: int
-    product: ProductResponse
+    product: Optional[ProductResponse] = None
     affiliate_url: Optional[str] = None
     position: int
     is_generic_idea: bool = False
