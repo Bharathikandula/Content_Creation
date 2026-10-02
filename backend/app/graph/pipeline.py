@@ -1,12 +1,9 @@
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 from langgraph.graph import StateGraph, END, START
-from langgraph.checkpoint.postgres import PostgresSaver
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_core.prompts import ChatPromptTemplate
 import json
 import httpx
-from datetime import datetime, timedelta
 
 from .state import PostState, ProductCandidate, GenericIdea
 from ..core.config import settings
@@ -38,7 +35,6 @@ def analyze_photo(state: PostState) -> Dict[str, Any]:
     language = state["language"]
     tone = state["tone"]
 
-    # Build prompt for outfit analysis
     system_prompt = f"""You are a fashion expert analyzing an outfit photo.
     Analyze the outfit and provide structured information.
 
@@ -79,7 +75,6 @@ def analyze_photo(state: PostState) -> Dict[str, Any]:
     try:
         result = json.loads(response.content)
     except json.JSONDecodeError:
-        # Try to extract JSON from response
         content = response.content
         start = content.find("{")
         end = content.rfind("}") + 1
@@ -111,7 +106,6 @@ def write_caption(state: PostState) -> Dict[str, Any]:
     child_present = state["child_present"]
     voice_samples = state.get("voice_samples", [])
 
-    # Build voice sample context
     voice_context = ""
     if voice_samples:
         voice_context = "\n\nHere are examples of the Creator's writing style:\n"
@@ -204,10 +198,7 @@ def write_description(state: PostState) -> Dict[str, Any]:
         if start != -1 and end > start:
             result = json.loads(content[start:end])
         else:
-            result = {
-                "description": "Outfit description",
-                "alt_text": "Fashion outfit photo"
-            }
+            result = {"description": "Outfit description", "alt_text": "Fashion outfit photo"}
 
     return {
         "outfit_description": result.get("description", ""),
@@ -271,13 +262,7 @@ def plan_queries(state: PostState) -> Dict[str, Any]:
     for item in outfit_items:
         name = item.get("name", "")
         color = item.get("color", "")
-        category = item.get("category", "")
-
-        # Build search query
-        query_parts = [color, name]
-        if language != "en":
-            query_parts.append(name)  Add English fallback
-        query = " ".join(filter(None, query_parts))
+        query = f"{color} {name}".strip()
         queries.append(query)
 
     return {
@@ -299,7 +284,7 @@ def search_products(state: PostState) -> Dict[str, Any]:
                     "engine": "google_shopping",
                     "q": query,
                     "api_key": settings.SERPAPI_API_KEY,
-                    "gl": "in",  # India
+                    "gl": "in",
                     "hl": state["language"],
                 },
                 timeout=10.0,
@@ -336,7 +321,6 @@ def rank_candidates(state: PostState) -> Dict[str, Any]:
     if not candidates:
         return {"selected_products": [], "generic_ideas": []}
 
-    # Build ranking prompt
     candidates_text = "\n".join([
         f"{i+1}. {c.title} - {c.price} from {c.source}"
         for i, c in enumerate(candidates[:20])
@@ -411,7 +395,7 @@ def check_search_results(state: PostState) -> str:
     elif attempts < 2:
         return "broaden_query"
     else:
-        return "generic_ideas"
+        return "resolve_links"
 
 
 def broaden_query(state: PostState) -> Dict[str, Any]:
@@ -441,9 +425,7 @@ def resolve_links(state: PostState) -> Dict[str, Any]:
                         "url": product.merchant_url,
                         "subid": f"{settings.CUELINKS_SUBID}_{creator_id}",
                     },
-                    headers={
-                        "Authorization": f"Bearer {settings.CUELINKS_API_KEY}",
-                    },
+                    headers={"Authorization": f"Bearer {settings.CUELINKS_API_KEY}"},
                     timeout=10.0,
                 )
                 data = response.json()
@@ -473,12 +455,10 @@ def write_script(state: PostState) -> Dict[str, Any]:
     llm = get_llm(settings.GEMINI_MODEL_STRONG)
 
     duration = state.get("script_duration", 30)
-    caption = state.get("caption", "")
     outfit_items = state.get("outfit_items", [])
     products = state.get("selected_products", [])
     language = state["language"]
 
-    # Calculate word count target (2.5 words per second)
     target_words = int(duration * 2.5)
 
     system_prompt = f"""You are a video scriptwriter for fashion creators.
@@ -590,15 +570,13 @@ def build_graph():
         {
             "resolve_links": "resolve_links",
             "broaden_query": "broaden_query",
-            "generic_ideas": "resolve_links",
         }
     )
 
     graph.add_edge("broaden_query", "search_products")
     graph.add_edge("resolve_links", "assemble_post")
-
-    # Script graph (separate run)
     graph.add_edge("assemble_post", "write_script")
+
     graph.add_conditional_edges(
         "write_script",
         check_script_length,

@@ -11,6 +11,7 @@ class ProductCandidate:
     merchant_url: Optional[str] = None
     google_url: Optional[str] = None
     score: float = 0.0
+    affiliate_url: Optional[str] = None
 
 
 @dataclass
