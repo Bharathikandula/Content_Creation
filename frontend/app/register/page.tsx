@@ -36,54 +36,23 @@ export default function Register() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Name
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="input-field"
-              required
-            />
+            <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="input-field" required />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="input-field"
-              required
-            />
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input-field" required />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="input-field"
-              required
-              minLength={8}
-            />
+            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="input-field" required minLength={8} />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Preferred Language
-            </label>
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="input-field"
-            >
+            <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Language</label>
+            <select value={language} onChange={(e) => setLanguage(e.target.value)} className="input-field">
               <option value="en">English</option>
               <option value="hi">Hindi</option>
               <option value="te">Telugu</option>
@@ -92,21 +61,14 @@ export default function Register() {
             </select>
           </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="btn-primary w-full"
-          >
+          <button type="submit" disabled={isLoading} className="btn-primary w-full">
             {isLoading ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
 
         <p className="text-center mt-4 text-gray-600">
           Already have an account?{' '}
-          <button
-            onClick={() => router.push('/login')}
-            className="text-primary-600 hover:underline"
-          >
+          <button onClick={() => router.push('/login')} className="text-primary-600 hover:underline">
             Sign In
           </button>
         </p>

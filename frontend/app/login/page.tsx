@@ -34,9 +34,7 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input
               type="email"
               value={email}
@@ -47,9 +45,7 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
             <input
               type="password"
               value={password}
@@ -59,21 +55,14 @@ export default function Login() {
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="btn-primary w-full"
-          >
+          <button type="submit" disabled={isLoading} className="btn-primary w-full">
             {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
         <p className="text-center mt-4 text-gray-600">
           Don't have an account?{' '}
-          <button
-            onClick={() => router.push('/register')}
-            className="text-primary-600 hover:underline"
-          >
+          <button onClick={() => router.push('/register')} className="text-primary-600 hover:underline">
             Register
           </button>
         </p>
